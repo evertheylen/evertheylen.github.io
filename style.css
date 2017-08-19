@@ -1,3 +1,46 @@
 body {
-	background-color: lightgrey;
+	background-color: rgb(234, 234, 234);
+	text-align: center;
+}
+
+.content {
+	max-width: 1000px;
+	margin-left: auto;
+	margin-right: auto;
+	padding-top: 10rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+
+.fancy-container {
+	max-width: 500px;
+	padding: 1.5rem;
+	margin: 1rem auto 1rem auto;
+	border: 1px solid rgba(0, 0, 0, 0.2);
+	border-radius: 0.3rem;
+	box-shadow: 0 0.05rem 0.4rem rgba(0, 0, 0, 0.11);
+	background-color: rgba(255, 255, 255, 0.31);
+}
+
+.bigthing {
+	margin-bottom: 5rem;
+}
+
+.logos a {
+	font-size: 5rem;
+	margin-left: 2rem;
+	color: inherit;
+	transition: all 0.2s ease-out;
+}
+
+.logos a:first-child {
+	margin-left: 0;
+}
+
+.logos a:hover {
+	color: #0FA0CE;
+}
+
+p {
+	margin: 0;
 }
