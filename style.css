@@ -12,8 +12,11 @@ body {
 	padding-right: 1rem;
 }
 
-.fancy-container {
+.intro {
 	max-width: 500px;
+}
+
+.fancy-container {
 	padding: 1.5rem;
 	margin: 1rem auto 1rem auto;
 	border: 1px solid rgba(0, 0, 0, 0.2);
@@ -43,4 +46,69 @@ body {
 
 p {
 	margin: 0;
+}
+
+ul {
+	list-style: none;
+	margin-left: 0;
+	padding-left: 0;
+	margin-bottom: 0;
+}
+
+ul li {
+	padding-left: 1em;
+	display: table-row;
+}
+
+ul li:before {
+	font-family: 'FontAwesome';
+	padding-right: 1rem;
+	display: table-cell;
+}
+
+.licheck:before {
+	content: "\f046"; /* fa-check-square-o */
+}
+
+.lischool:before {
+	content: "\f19d"; /* fa-graduation-cap */
+}
+
+.licogs:before {
+	content: "\f085"; /* fa-cogs */
+}
+
+.licode:before {
+	content: "\f121"; /* fa-code */
+}
+
+.litodo:before {
+	content: "\f096"; /* fa-square-o */
+}
+
+/* ... component stack .............................. */
+
+.component {
+	text-align: left;
+	max-width: 700px;
+}
+
+.component-left {
+	float: left;
+}
+
+.component-right {
+	float: right;
+}
+
+.component-title {
+	font-size: 2rem;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	margin-bottom: 1rem;
+}
+
+.component-subtitle {
+	font-size: 1.3rem;
+	color: #646464;
+	margin-bottom: 0.8rem;
 }
