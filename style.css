@@ -1,19 +1,20 @@
+
+html {
+	font-size: 12px;
+}
+
 body {
 	background-color: rgb(234, 234, 234);
-	text-align: center;
+	text-align: left;
 }
 
 .content {
-	max-width: 1000px;
+	max-width: 800px;
 	margin-left: auto;
 	margin-right: auto;
 	padding-top: 10rem;
 	padding-left: 1rem;
 	padding-right: 1rem;
-}
-
-.intro {
-	max-width: 500px;
 }
 
 .fancy-container {
@@ -23,10 +24,26 @@ body {
 	border-radius: 0.3rem;
 	box-shadow: 0 0.05rem 0.4rem rgba(0, 0, 0, 0.11);
 	background-color: rgba(255, 255, 255, 0.31);
+	margin-left: auto;
+	margin-right: auto;
+}
+
+p + p {
+    margin-top: 0.5rem;
+}
+
+.fancy-title {
+	font-weight: bold;
+	font-size: 3rem;
+	margin-bottom: 0.5rem;
 }
 
 .bigthing {
 	margin-bottom: 5rem;
+}
+
+.center {
+	text-align: center;
 }
 
 .logos a {
@@ -66,49 +83,50 @@ ul li:before {
 	display: table-cell;
 }
 
-.licheck:before {
-	content: "\f046"; /* fa-check-square-o */
-}
-
-.lischool:before {
-	content: "\f19d"; /* fa-graduation-cap */
-}
-
-.licogs:before {
-	content: "\f085"; /* fa-cogs */
-}
-
-.licode:before {
-	content: "\f121"; /* fa-code */
-}
-
-.litodo:before {
-	content: "\f096"; /* fa-square-o */
-}
-
-/* ... component stack .............................. */
-
-.component {
-	text-align: left;
-	max-width: 700px;
-}
-
-.component-left {
-	float: left;
-}
-
-.component-right {
-	float: right;
-}
-
-.component-title {
+.project-title {
 	font-size: 2rem;
-	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-	margin-bottom: 1rem;
 }
 
-.component-subtitle {
-	font-size: 1.3rem;
-	color: #646464;
-	margin-bottom: 0.8rem;
+.project {
+	border-left: 1rem solid rgba(0, 0, 0, 0.1);
+	padding-left: 1rem;
+	margin-top: 1rem;
+	transition: border-color .4s ease;
 }
+
+.project:hover {
+	border-color: rgba(0, 0, 0, 0.2);
+}
+
+.tag {
+	font-variant: small-caps;
+	font-size: 1.3rem;
+	color: white;
+	border-radius: 2px;
+	padding: 0 0.2rem 0.1rem;
+	margin-left: 1rem;
+	position: relative;
+	top: -0.2rem;
+}
+
+.tag + .tag {
+	margin-left: 0.5rem;
+}
+
+.tag-py {
+	background-color: #316b9b; /* #3572a5 */
+}
+
+.tag-js {
+	background-color: #f5de19; /* #f1e05a */
+	color: black;
+}
+
+.tag-go {
+	background-color: #29bdb1; /*#375eab;*/
+}
+
+.tag-cpp {
+	background-color: #f34b7d;
+}
+
