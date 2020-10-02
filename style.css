@@ -4,7 +4,8 @@ html {
 }
 
 body {
-	background-color: rgb(234, 234, 234);
+	background-color: rgb(22, 22, 22);
+	color: rgb(234, 234, 234);
 	text-align: left;
 }
 
@@ -23,7 +24,7 @@ body {
 	border: 1px solid rgba(0, 0, 0, 0.2);
 	border-radius: 0.3rem;
 	box-shadow: 0 0.05rem 0.4rem rgba(0, 0, 0, 0.11);
-	background-color: rgba(255, 255, 255, 0.31);
+	background-color: rgba(255, 255, 255, 0.1);
 	margin-left: auto;
 	margin-right: auto;
 }
@@ -88,14 +89,15 @@ ul li:before {
 }
 
 .project {
-	border-left: 1rem solid rgba(0, 0, 0, 0.1);
+	border-left: 1rem solid;
+	border-color: rgba(255, 255, 255, 0.15);
 	padding-left: 1rem;
 	margin-top: 1rem;
 	transition: border-color .4s ease;
 }
 
 .project:hover {
-	border-color: rgba(0, 0, 0, 0.2);
+	border-color: rgba(255, 255, 255, 0.3);
 }
 
 .tag {
@@ -130,3 +132,21 @@ ul li:before {
 	background-color: #f34b7d;
 }
 
+@media screen and (prefers-color-scheme: light) {
+	body {
+		background-color: rgb(234, 234, 234);
+		color: black;
+	}
+
+	.logos a:hover {
+		color: #0FA0CE;
+	}
+
+	.project {
+		border-color: rgba(0, 0, 0, 0.1);
+	}
+
+	.project:hover {
+		border-color: rgba(0, 0, 0, 0.2);
+	}
+}
