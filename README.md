@@ -1,5 +1,5 @@
 
-# evertheylen.eu
+# [evertheylen.eu](https://evertheylen.eu/)
 
 Based on the quick start template for [Hugo theme Stack](https://github.com/CaiJimmy/hugo-theme-stack). It uses [Hugo modules](https://gohugo.io/hugo-modules/) feature to load the theme.
 
