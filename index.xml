@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Evert Heylen</title><link>https://evertheylen.eu/</link><description>Recent content on Evert Heylen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sun, 11 Feb 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://evertheylen.eu/index.xml" rel="self" type="application/rss+xml"/><item><title>My Desktop+Tablet Development Setup</title><link>https://evertheylen.eu/p/my-desktop-tablet-development-setup/</link><pubDate>Sun, 11 Feb 2024 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/p/my-desktop-tablet-development-setup/</guid><description>&lt;img src="https://evertheylen.eu/p/my-desktop-tablet-development-setup/tablet_with_desktop.jpg" alt="Featured image of post My Desktop+Tablet Development Setup" />&lt;h1 id="the-problem">The problem&lt;/h1>
+&lt;p>My requirements are as follows:&lt;/p>
+&lt;ol>
+&lt;li>My main development environment has to be Linux. (Not just WSL, I want a proper Linux desktop environment.)&lt;/li>
+&lt;li>I like to sketch stuff and draw diagrams. Paper works, but it gets disorganized really quickly. A digital device allows me to keep my notes organized and you can have an infinite canvas with nice colors and edit history. (Note: I don’t think there are good apps like this on Linux.)&lt;/li>
+&lt;li>I want to build my own desktop. You can get a lot more performance for your money, and I can hand-pick each component to my liking (e.g. a good CPU, a mid-tier GPU, stellar Linux support).&lt;/li>
+&lt;li>While I spend most of my time working from home, I do have to work in other places sometimes. I don’t want to maintain duplicate environments.&lt;/li>
+&lt;/ol>
+&lt;p>Requirement 2 suggests a tablet, 3 suggests a desktop, and 4 suggests a laptop. A windows laptop-tablet hybrid may be a compromise solution but I tried it and did not like it &lt;sup id="fnref:1">&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref">1&lt;/a>&lt;/sup>.&lt;/p>
+&lt;h1 id="the-solution">The solution&lt;/h1>
+&lt;p>I have two devices:&lt;/p>
+&lt;ul>
+&lt;li>A desktop I built myself, which runs Linux.&lt;/li>
+&lt;li>A Samsung Tab S7+, on which I run OneNote.&lt;/li>
+&lt;/ul>
+&lt;p>This setup satisfies requirements 1, 2 and 3. But how do I satisfy requirement 4? It’s a combination of three things:&lt;/p>
+&lt;ul>
+&lt;li>&lt;a class="link" href="https://github.com/coder/code-server" target="_blank" rel="noopener"
+>code-server&lt;/a>, which lets you run Visual Studio Code in any browser.&lt;/li>
+&lt;li>&lt;a class="link" href="https://www.samsung.com/us/apps/dex/" target="_blank" rel="noopener"
+>DeX mode&lt;/a> on the Samsung tablet, although not technically required, gives me a traditional desktop environment. I also have the keyboard accessory.&lt;/li>
+&lt;li>A bunch of networking configuration so I can reach my desktop from the internet. I only expose a single SSH port, and use SSH tunnels for anything else. (I use &lt;a class="link" href="https://www.duckdns.org/" target="_blank" rel="noopener"
+>duckdns&lt;/a> and &lt;a class="link" href="https://juicessh.com/" target="_blank" rel="noopener"
+>JuiceSSH Pro&lt;/a> to make it work).&lt;/li>
+&lt;/ul>
+&lt;p>This allows me to remotely connect with code-server (running on my desktop) through an SSH tunnel. In the end I’m able to work using the exact same editor as if I were on my desktop. This isn’t rocket science of course, it’s kinda like a home-built version of &lt;a class="link" href="https://github.com/features/codespaces" target="_blank" rel="noopener"
+>Github Codespaces&lt;/a> where the server lives in your house.&lt;/p>
+&lt;p>This is fine for “simple” development where you never leave your IDE or terminal. Web development is a little harder because you really want to debug your frontend using devtools. While forwarding the ports to &lt;a class="link" href="https://vitejs.dev/" target="_blank" rel="noopener"
+>vite&lt;/a> (or whatever you want to use) is no problem, most browsers on Android assume you do all your debugging work remotely via USB or the network. The solution is &lt;a class="link" href="https://kiwibrowser.com/" target="_blank" rel="noopener"
+>Kiwi Browser&lt;/a>, which has full devtools available.&lt;/p>
+&lt;h1 id="conclusion">Conclusion&lt;/h1>
+&lt;p>I’ve been using this setup for more than 2 years now and I really like it. It’s not for everyone as it requires a little work to set up and maintain, but for me it combines the best of Android with the best of (Desktop) Linux leading to a very smooth experience.&lt;/p>
+&lt;p>If you have any questions about this setup, feel free to &lt;a class="link" href="mailto:evertheylen@gmail.com" >contact me&lt;/a>!&lt;/p>
+&lt;div class="footnotes" role="doc-endnotes">
+&lt;hr>
+&lt;ol>
+&lt;li id="fn:1">
+&lt;p>I once had an &lt;a class="link" href="https://support.hp.com/us-en/document/c06010885" target="_blank" rel="noopener"
+>HP ZBook Studio G5&lt;/a>, which seemed like a powerful laptop with a nice large pen-supported touchscreen. One problem, Linux support was really sketchy. I really tried to make it work, even manually compiling chromium to include Wayland support. Even then I couldn’t find a good note-taking app. So I settled on Windows with WSL but just plain didn’t like it. Then one day I opened my laptop to a big advert for some XBox service and that settled it &amp;ndash; no more Windows.&amp;#160;&lt;a href="#fnref:1" class="footnote-backref" role="doc-backlink">&amp;#x21a9;&amp;#xfe0e;&lt;/a>&lt;/p>
+&lt;/li>
+&lt;/ol>
+&lt;/div></description></item><item><title>About me</title><link>https://evertheylen.eu/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/about/</guid><description>&lt;img src="https://evertheylen.eu/about/ecrins.jpg" alt="Featured image of post About me" />&lt;p>I like to solve problems, usually with code. I have a degree in &lt;a class="link" href="https://onderwijsaanbod.kuleuven.be/opleidingen/e/CQ_52364384.htm#activetab=diploma_omschrijving" target="_blank" rel="noopener"
+>Computer Science&lt;/a> and live in Belgium. When I&amp;rsquo;m not coding you can find me climbing, mountaineering or doing other sports. I am also interested in sustainability and space exploration.&lt;/p>
+&lt;p>I used to work at &lt;a class="link" href="https://www.mycellhub.com/" target="_blank" rel="noopener"
+>MyCellHub&lt;/a> and am currently working at my startup &lt;a class="link" href="https://ecotarian.info/" target="_blank" rel="noopener"
+>Ecotarian&lt;/a>. Feel free to contact me at &lt;a class="link" href="mailto:evertheylen@gmail.com" >evertheylen@gmail.com&lt;/a> if you have any questions!&lt;/p>
+&lt;h1 id="some-projects">Some projects&lt;/h1>
+&lt;ul>
+&lt;li>&lt;strong>&lt;a class="link" href="https://sparrow.readthedocs.io/en/latest/" target="_blank" rel="noopener"
+>Sparrow&lt;/a>&lt;/strong>: A Python ORM, made because I wasn&amp;rsquo;t allowed to use any existing ORM library.&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/logicpy" target="_blank" rel="noopener"
+>logicpy&lt;/a>&lt;/strong>: An implementation of the concepts underlying Prolog and logic programming, in pure Python.&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/Notation" target="_blank" rel="noopener"
+>Notation&lt;/a>&lt;/strong>: A small webapp to make drawings that are easy to embed in Notion. (no longer online)&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/TA_TO/tree/master/Helix" target="_blank" rel="noopener"
+>Helix&lt;/a>&lt;/strong>: Fuzzy matching of regular expressions in DNA, university project.&lt;/li>
+&lt;/ul></description></item><item><title>Archives</title><link>https://evertheylen.eu/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/archives/</guid><description/></item><item><title>Search</title><link>https://evertheylen.eu/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/search/</guid><description/></item></channel></rss>
