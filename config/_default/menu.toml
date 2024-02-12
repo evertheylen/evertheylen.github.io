@@ -1,0 +1,35 @@
+# Configure main menu and social menu
+#[[main]]
+#identifier = "home"
+#name = "Home"
+#url = "/"
+#[main.params]
+#icon = "home"
+#newtab = true
+
+[[social]]
+identifier = "github"
+name = "GitHub"
+url = "https://github.com/evertheylen"
+
+[social.params]
+icon = "brand-github"
+
+[[social]]
+identifier = "stackoverflow"
+name = "Stack Overflow"
+url = "https://stackoverflow.com/users/2678118/evert-heylen"
+
+[social.params]
+icon = "brand-stackoverflow"
+
+
+[[social]]
+identifier = "mail"
+name = "Email"
+url = "mailto:evertheylen@gmail.com"
+
+[social.params]
+icon = "brand-mail"
+
+# icons are "tabler icons"
