@@ -1,5 +1,5 @@
 ---
-title: "Node vs Bun: which is the fastest backend?"
+title: "Node vs Bun: no backend performance difference"
 slug: node-vs-bun
 date: 2024-10-04
 image: cover2.webp
