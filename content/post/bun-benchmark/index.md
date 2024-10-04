@@ -8,9 +8,9 @@ tags:
     - benchmark
 ---
 
-In this article I'll be comparing the performance of [Bun](https://bun.sh/) vs [Node](https://nodejs.org/). In particular (as bun is many things), I will focus on their performance as the runtime for your server-side JavaScript code. With Node being the default choice for many, Bun has to prove it is worthy of your attention. It makes strong claims:
+In this article I'll be comparing the performance of [Bun](https://bun.sh/) vs [Node](https://nodejs.org/). In particular (as Bun is many things), I will focus on their performance as the runtime for your server-side JavaScript code. With Node being the default choice for many, Bun has to prove it is worthy of your attention. It makes strong claims:
 
-- There’s a benchmark right on the homepage, claiming almost *5 times* more requests per second than node! [^1].
+- There’s a benchmark right on the homepage, claiming almost *5 times* more requests per second than Node! [^1].
 - In the [documentation](https://bun.sh/docs/cli/run#performance), they claim that *“In most cases, the startup and running performance is faster than V8, the engine used by Node.js and Chromium-based browsers.”*
 
 [^1]: I believe there is a chance Bun is kinda cheating here, with a different version of React than what Node uses. See [this benchmark](https://medium.com/deno-the-complete-reference/node-js-vs-deno-vs-bun-server-side-rendering-performance-comparison-f80a5abc766f).
@@ -80,7 +80,7 @@ The end result works similarly to Node’s `cluster` module, but Node’s soluti
 
 ### Frameworks
 
-I chose not to use any server frameworks/libraries to focus on the runtime itself. The original repository did test a few popular Node frameworks, which shows a sizable performance impact. From fast to slow, it goes koa > express > hapi. In any case, not using any framework is always the fastest.
+I chose not to use any server frameworks/libraries to focus on the runtime itself. The original repository did test a few popular Node frameworks, which shows a sizable performance impact. From fast to slow, it goes koa > express > hapi. In any case, not using a framework is always the fastest.
 
 In my own (separate) tests, using a library like hapi did make Node substantially slower than Bun. Bun’s native `serve` API feels a bit more modern and functional. If you have to choose between Node+hapi and just Bun, Bun will win. But as a more realistic example, Node+koa vs Bun+Hono is (probably) going to be quite close.
 
