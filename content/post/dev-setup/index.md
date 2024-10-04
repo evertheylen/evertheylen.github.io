@@ -1,5 +1,6 @@
 ---
 title: My Desktop+Tablet Development Setup
+slug: my-desktop-tablet-development-setup
 date: 2024-02-11
 image: tablet_with_desktop.jpg
 tags:
