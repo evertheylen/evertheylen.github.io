@@ -114,7 +114,7 @@ I hope so! But I’d love to hear what others have to say about it. I read [this
 --network=pasta:-t,auto,-u,auto,-T,none,-U,none
 ```
 
-Feel free to discuss this article on Hackernews or Reddit. Alternatively, [open an issue on github](https://github.com/evertheylen/probox/issues) or send me [an email](mailto:evertheylen@gmail.com).
+Feel free to discuss this article on [Hackernews](https://news.ycombinator.com/item?id=43061867) or [r/podman](https://www.reddit.com/r/podman/comments/1iqaum4/everyday_project_isolation_for_developers_on/). Alternatively, [open an issue on github](https://github.com/evertheylen/probox/issues) or send me [an email](mailto:evertheylen@gmail.com).
 
 ### Bonus: the rest of my system
 
