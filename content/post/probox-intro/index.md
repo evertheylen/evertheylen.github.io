@@ -42,7 +42,7 @@ While stateful containers are assumed, it also shouldn't be *too* hard to (re)cr
 
 Eventually I settled on a pretty beefy base image with most of the tools I use during development already installed. This includes a fancy shell, compilers, debuggers, runtimes, language servers, an IDE with plenty of plugins, etc. I only pay the storage cost once, as the image is shared among all my containers.
 
-You can find the base image I use [on github](https://github.com/evertheylen/probox/blob/main/arch-with-code-server/Containerfile), but you should probably modify it before you use it. It is based on Arch Linux, with tools for Python, Javascript, Rust and C/C++. I also include code-server + plugins (a hosted variant of VSCode) with plenty of plugins and configuration for Podman-In-Podman.
+You can find the base image I use [on github](https://github.com/evertheylen/probox/blob/main/arch-with-code-server/Containerfile), but you should probably modify it before you use it. It is based on Arch Linux, with tools for Python, Javascript, Rust and C/C++. I also include code-server (a hosted variant of VSCode) and configuration for Podman-In-Podman.
 
 
 ## What to share
@@ -57,9 +57,9 @@ Every development container is linked to a single directory in my filesystem. To
 
 ### Network
 
-For my type of development, I use a lot of services that expose HTTP ports and expect you to use a browser. I still run my browser in the host (see below). Again we have to maintain the illusion, so if e.g. vite tells me it is running on port 5173, I want to be able to go to 127.0.0.1:5173 without issues. I definitely *don’t* want to recreate the entire container with a different `--expose` option as podman [would have you do by default](https://github.com/containers/podman/issues/18309).
+For my type of development, I use a lot of services that expose HTTP ports and expect you to use a browser. I still run my browser in the host (see below). Again we have to maintain the illusion, so if *vite* tells me it is running on port 5173, I want to be able to go to 127.0.0.1:5173 without issues. I definitely *don’t* want to recreate the entire container with a different `--expose` option as podman [would have you do by default](https://github.com/containers/podman/issues/18309).
 
-Luckily, podman uses [*pasta](https://passt.top/passt/about/)* under the hood which can automatically forward ports from container to host. Importantly you can also make it *not* forward ports from host to container. So I use the flag `--network=pasta:-t,auto,-u,auto,-T,none,-U,none` and everything Just Works.
+Luckily, podman uses [*pasta*](https://passt.top/passt/about/) under the hood which can automatically forward ports from container to host. Importantly you can also make it *not* forward ports from host to container. So I use the flag `--network=pasta:-t,auto,-u,auto,-T,none,-U,none` and everything Just Works.
 
 Except for one thing: pasta will forward ports from container to host if they’re bound on 0.0.0.0, and will also bind the forwarded port on 0.0.0.0 on the host. This means I still need to use a firewall on my host to limit the ports that are available to the rest of my network. While I’d love a solution that doesn’t rely on a firewall, I think this is a good tradeoff. Sometimes I *do* want to share a port with my smartphone to test something, and I also think ports bound on localhost in a container should remain within the container. Luckily firewall configuration is pretty easy with firewall-config which came preinstalled on my Fedora host.
 
@@ -69,8 +69,6 @@ Except for one thing: pasta will forward ports from container to host if they’
 This is where things get really interesting. I don’t think I can claim much security benefits if I don’t protect my SSH keys. I can’t just allow any container read access to the keys themselves. This is why I start an ssh-agent in the host, *per project*, and forward the agent to the container. Then, combined with `ksshaskpass` (or an equivalent program), I can manage which containers can access which key and even interactively allow or deny the usage of a key (with `ssh-add -c`).
 
 ![The dialog comes from the host, triggered by code-server running in the container](screenshot_ksshaskpass.png)
-
-The dialog comes from the host, triggered by code-server running in the container.
 
 
 ## Probox
