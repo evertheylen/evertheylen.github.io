@@ -11,11 +11,11 @@ tags:
 
 ## The problem
 
-As a developer, you likely have to run a lot of code you can’t or don’t have time to verify. Many modern projects have lots of dependencies, and none of the package managers I know provide any isolation from the rest of your system. For example, *create-react-app* will install 1400 dependencies from 285 authors. Do you trust all of them? More importantly, do you trust their security posture?
+As a developer, you likely run a lot of code you can’t or don’t have time to verify. Many modern projects have lots of dependencies, and none of the package managers I know provide any isolation from the rest of your system. For example, *create-react-app* will install 1400 dependencies from 285 authors. Do you trust all of them? More importantly, do you trust their security posture?
 
 Eventually, this will go wrong. Many examples exist ([PyPI](https://arxiv.org/abs/2309.11021), [NPM](https://jfrog.com/blog/large-scale-npm-attack-targets-azure-developers-with-malicious-packages/), [AUR](https://sensorstechforum.com/arch-linux-aur-repository-found-contain-malware/)). Even though the lack of isolation is the de facto standard, I think this is borderline irresponsible. Especially as a freelance developer working for multiple clients. Therefore, while I can’t fully prevent supply-chain attacks, I can drastically minimize their potential damage.
 
-In practice, this means I need to isolate projects from each other and from the system itself. However, I also want it to be convenient and performant. I wrote a tool named [probox](https://github.com/evertheylen/probox), and after using it for a few months, I think I reached my goal.
+In practice, this means I need a system to isolate projects from each other and from the system itself. However, it needs be easy to use, performant, and above all it needs to *get out of my way* while I'm working. I wrote a tool named [**probox**](https://github.com/evertheylen/probox), and after using it for a few months, I think I reached my goal.
 
 This how the end result will look like, but read on for the details:
 
@@ -33,7 +33,7 @@ In order to protect my projects from eachother and the host, I create a containe
 
 ### Stateful over stateless
 
-As opposed to most usages of containers, you want these “development” containers to *not* be disposable by default. Since you can’t foresee every tool or config you’ll ever need for development, your `Containerfile` will never be finished. So you’ll either spend an ungodly amount of time rebuilding your base image, or you’ll have to be very disciplined about using `podman commit`, or you’ll just lose all your progress upon every reboot. Best to just keep your containers stateful—this is the default anyway.
+Unlike most usages of containers, you want these “development” containers to *not* be disposable by default. Since you can’t foresee every tool or config you’ll ever need for development, your `Containerfile` will never be finished. So you’ll either spend an ungodly amount of time rebuilding your base image, or you’ll have to be very disciplined about using `podman commit`, or you’ll just lose all your progress upon every reboot. Best to just keep your containers stateful—this is the default anyway.
 
 
 ### Beefy containers
@@ -75,7 +75,9 @@ The dialog comes from the host, triggered by code-server running in the containe
 
 ## Probox
 
-I automated all the things above in a tool I call *probox* . It is a single Python file without dependencies so it should be easy to install (and verify). I released it as [open-source software on GitHub](https://github.com/evertheylen/probox). It still needs some work (the default image will only work for me) but feel free to reach out to me if you are interested in it.
+I automated all the things above in a tool I call *probox*. [Check it out on GitHub!](https://github.com/evertheylen/probox)
+
+It is a single Python file without dependencies so it should be easy to install (and verify). It still needs some work (the default image will only work for me) but feel free to reach out to me if you are interested in it.
 
 90% of my usage consists of just two commands: `probox create` and `probox run`. Probox automatically uses the current directory and tries to match it to a project. But there are more commands:
 
