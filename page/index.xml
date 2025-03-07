@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Pages on Evert Heylen</title><link>https://evertheylen.eu/page/</link><description>Recent content in Pages on Evert Heylen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><atom:link href="https://evertheylen.eu/page/index.xml" rel="self" type="application/rss+xml"/><item><title>About me</title><link>https://evertheylen.eu/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/about/</guid><description>&lt;img src="https://evertheylen.eu/about/ecrins.jpg" alt="Featured image of post About me" />&lt;p>I strongly believe the climate crisis is the most pressing problem of our time. Therefore, I want to actively work towards a more sustainable society.&lt;/p>
+&lt;p>I love coding and have a degree in &lt;a class="link" href="https://onderwijsaanbod.kuleuven.be/opleidingen/e/CQ_52364384.htm#activetab=diploma_omschrijving" target="_blank" rel="noopener"
+>Computer Science&lt;/a>. I am based in Belgium. When I&amp;rsquo;m not coding you can find me climbing, mountaineering or doing other sports.&lt;/p>
+&lt;p>Feel free to contact me at &lt;a class="link" href="mailto:evertheylen@gmail.com" >evertheylen@gmail.com&lt;/a> if you have any questions!&lt;/p>
+&lt;h1 id="some-projects">Some projects
+&lt;/h1>&lt;ul>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/probox" target="_blank" rel="noopener"
+>probox&lt;/a>&lt;/strong>: A tool to create secure, isolated development environments without sacrificing performance or ease of use.&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/logicpy" target="_blank" rel="noopener"
+>logicpy&lt;/a>&lt;/strong>: An implementation of the concepts underlying Prolog and logic programming, in pure Python.&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/Notation" target="_blank" rel="noopener"
+>Notation&lt;/a>&lt;/strong>: A small webapp to make drawings that are easy to embed in Notion. (no longer online)&lt;/li>
+&lt;li>&lt;strong>&lt;a class="link" href="https://github.com/evertheylen/TA_TO/tree/master/Helix" target="_blank" rel="noopener"
+>Helix&lt;/a>&lt;/strong>: Fuzzy matching of regular expressions in DNA, university project.&lt;/li>
+&lt;li>I think developers still spend a &lt;em>lot&lt;/em> of time on moving data around, so I wrote two ORMs: &lt;a class="link" href="https://github.com/evertheylen/univocal" target="_blank" rel="noopener"
+>Univocal&lt;/a> in Javascript and &lt;a class="link" href="https://github.com/evertheylen/Sparrow" target="_blank" rel="noopener"
+>Sparrow&lt;/a> in Python.&lt;/li>
+&lt;/ul></description></item><item><title>Archives</title><link>https://evertheylen.eu/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/archives/</guid><description/></item><item><title>Search</title><link>https://evertheylen.eu/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/search/</guid><description/></item></channel></rss>
