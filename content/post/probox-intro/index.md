@@ -2,7 +2,7 @@
 title: Everyday project isolation for developers on Linux
 slug: probox-intro
 date: 2025-02-15
-image: seal_center.jpg
+image: seal_center2.jpg
 tags:
     - linux
     - containers
