@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Evert Heylen</title><link>https://evertheylen.eu/</link><description>Recent content on Evert Heylen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 15 Feb 2025 00:00:00 +0000</lastBuildDate><atom:link href="https://evertheylen.eu/index.xml" rel="self" type="application/rss+xml"/><item><title>Everyday project isolation for developers on Linux</title><link>https://evertheylen.eu/p/probox-intro/</link><pubDate>Sat, 15 Feb 2025 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/p/probox-intro/</guid><description>&lt;img src="https://evertheylen.eu/p/probox-intro/seal_center2.jpg" alt="Featured image of post Everyday project isolation for developers on Linux" /&gt;&lt;h2 id="the-problem"&gt;The problem
+&lt;/h2&gt;&lt;p&gt;As a developer, you likely run a lot of code you can’t or don’t have time to verify. Many modern projects have lots of dependencies, and none of the package managers I know provide any isolation from the rest of your system. For example, &lt;em&gt;create-react-app&lt;/em&gt; will install 1400 dependencies from 285 authors. Do you trust all of them? More importantly, do you trust their security posture?&lt;/p&gt;
+&lt;p&gt;Eventually, this will go wrong. Many examples exist (&lt;a class="link" href="https://arxiv.org/abs/2309.11021" target="_blank" rel="noopener"
+&gt;PyPI&lt;/a&gt;, &lt;a class="link" href="https://jfrog.com/blog/large-scale-npm-attack-targets-azure-developers-with-malicious-packages/" target="_blank" rel="noopener"
+&gt;NPM&lt;/a&gt;, &lt;a class="link" href="https://sensorstechforum.com/arch-linux-aur-repository-found-contain-malware/" target="_blank" rel="noopener"
+&gt;AUR&lt;/a&gt;). Even though the lack of isolation is the de facto standard, I think this is borderline irresponsible. Especially as a freelance developer working for multiple clients. Therefore, while I can’t fully prevent supply-chain attacks, I can drastically minimize their potential damage.&lt;/p&gt;
+&lt;p&gt;In practice, this means I need a system to isolate projects from each other and from the system itself. However, it needs be easy to use, performant, and above all it needs to &lt;em&gt;get out of my way&lt;/em&gt; while I&amp;rsquo;m working. I wrote a tool named &lt;a class="link" href="https://github.com/evertheylen/probox" target="_blank" rel="noopener"
+&gt;&lt;strong&gt;probox&lt;/strong&gt;&lt;/a&gt;, and after using it for a few months, I think I reached my goal.&lt;/p&gt;
+&lt;p&gt;This how the end result will look like, but read on for the details:&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://evertheylen.eu/p/probox-intro/onenote_diagram.png"
+width="2144"
+height="1283"
+srcset="https://evertheylen.eu/p/probox-intro/onenote_diagram_hu_5dc12845da63f7ab.png 480w, https://evertheylen.eu/p/probox-intro/onenote_diagram_hu_fd26d08909e95485.png 1024w"
+loading="lazy"
+alt="A system with two projects, Foo and Bar"
+class="gallery-image"
+data-flex-grow="167"
+data-flex-basis="401px"
+&gt;&lt;/p&gt;
+&lt;h2 id="how-to-isolate"&gt;How to isolate
+&lt;/h2&gt;&lt;p&gt;Let’s get this out of the way first: if you’re looking for the strongest possible isolation, you need to use emulation (e.g. &lt;a class="link" href="https://www.qubes-os.org/" target="_blank" rel="noopener"
+&gt;Qubes OS&lt;/a&gt;). For my purposes, that seemed like too high a price in convenience and performance.&lt;/p&gt;
+&lt;p&gt;So I went with containers. After using &lt;code&gt;docker&lt;/code&gt; in many projects before, I settled on using &lt;code&gt;podman&lt;/code&gt; as it was more performant, has a stronger focus on security (e.g. rootless mode) and integrates better with Linux (e.g. systemd support).&lt;/p&gt;
+&lt;p&gt;In order to protect my projects from eachother and the host, I create a container per project. Exactly what constitutes one project is up to you.&lt;/p&gt;
+&lt;h3 id="stateful-over-stateless"&gt;Stateful over stateless
+&lt;/h3&gt;&lt;p&gt;Unlike most usages of containers, you want these “development” containers to &lt;em&gt;not&lt;/em&gt; be disposable by default. Since you can’t foresee every tool or config you’ll ever need for development, your &lt;code&gt;Containerfile&lt;/code&gt; will never be finished. So you’ll either spend an ungodly amount of time rebuilding your base image, or you’ll have to be very disciplined about using &lt;code&gt;podman commit&lt;/code&gt;, or you’ll just lose all your progress upon every reboot. Best to just keep your containers stateful—this is the default anyway.&lt;/p&gt;
+&lt;h3 id="beefy-containers"&gt;Beefy containers
+&lt;/h3&gt;&lt;p&gt;While stateful containers are assumed, it also shouldn&amp;rsquo;t be &lt;em&gt;too&lt;/em&gt; hard to (re)create containers. The more you include in your base image, the less work you&amp;rsquo;ll have to do after creating a new container. OTOH, more software means a larger attack surface.&lt;/p&gt;
+&lt;p&gt;Eventually I settled on a pretty beefy base image with most of the tools I use during development already installed. This includes a fancy shell, compilers, debuggers, runtimes, language servers, an IDE with plenty of plugins, etc. I only pay the storage cost once, as the image is shared among all my containers.&lt;/p&gt;
+&lt;p&gt;You can find the base image I use &lt;a class="link" href="https://github.com/evertheylen/probox/blob/main/arch-with-code-server/Containerfile" target="_blank" rel="noopener"
+&gt;on github&lt;/a&gt;, but you should probably modify it before you use it. It is based on Arch Linux, with tools for Python, Javascript, Rust and C/C++. I also include code-server (a hosted variant of VSCode) and configuration for Podman-In-Podman.&lt;/p&gt;
+&lt;h2 id="what-to-share"&gt;What to share
+&lt;/h2&gt;&lt;p&gt;In order to make the experience as convenient as possible, I try to maintain the illusion that you’re working on one single Linux system. That is, as long as you stay within the project-based boundaries, &lt;strong&gt;the experience is equivalent to not using containers at all&lt;/strong&gt;.&lt;/p&gt;
+&lt;h3 id="files"&gt;Files
+&lt;/h3&gt;&lt;p&gt;Every development container is linked to a single directory in my filesystem. To maintain the illusion, it is bound on the exact same path as on my host filesystem. The container also uses the same UID so there are no permission conflicts. (In podman terms, &lt;code&gt;--userns=keep-id&lt;/code&gt;).&lt;/p&gt;
+&lt;h3 id="network"&gt;Network
+&lt;/h3&gt;&lt;p&gt;For my type of development, I use a lot of services that expose HTTP ports and expect you to use a browser. I still run my browser in the host (see below). Again we have to maintain the illusion, so if &lt;em&gt;vite&lt;/em&gt; tells me it is running on port 5173, I want to be able to go to 127.0.0.1:5173 without issues. I definitely &lt;em&gt;don’t&lt;/em&gt; want to recreate the entire container with a different &lt;code&gt;--expose&lt;/code&gt; option as podman &lt;a class="link" href="https://github.com/containers/podman/issues/18309" target="_blank" rel="noopener"
+&gt;would have you do by default&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Luckily, podman uses &lt;a class="link" href="https://passt.top/passt/about/" target="_blank" rel="noopener"
+&gt;&lt;em&gt;pasta&lt;/em&gt;&lt;/a&gt; under the hood which can automatically forward ports from container to host. Importantly you can also make it &lt;em&gt;not&lt;/em&gt; forward ports from host to container. So I use the flag &lt;code&gt;--network=pasta:-t,auto,-u,auto,-T,none,-U,none&lt;/code&gt; and everything Just Works.&lt;/p&gt;
+&lt;p&gt;Except for one thing: pasta will forward ports from container to host if they’re bound on 0.0.0.0, and will also bind the forwarded port on 0.0.0.0 on the host. This means I still need to use a firewall on my host to limit the ports that are available to the rest of my network. While I’d love a solution that doesn’t rely on a firewall, I think this is a good tradeoff. Sometimes I &lt;em&gt;do&lt;/em&gt; want to share a port with my smartphone to test something, and I also think ports bound on localhost in a container should remain within the container. Luckily firewall configuration is pretty easy with firewall-config which came preinstalled on my Fedora host.&lt;/p&gt;
+&lt;h3 id="ssh-keys"&gt;SSH keys
+&lt;/h3&gt;&lt;p&gt;This is where things get really interesting. I don’t think I can claim much security benefits if I don’t protect my SSH keys. I can’t just allow any container read access to the keys themselves. This is why I start an ssh-agent in the host, &lt;em&gt;per project&lt;/em&gt;, and forward the agent to the container. Then, combined with &lt;code&gt;ksshaskpass&lt;/code&gt; (or an equivalent program), I can manage which containers can access which key and even interactively allow or deny the usage of a key (with &lt;code&gt;ssh-add -c&lt;/code&gt;).&lt;/p&gt;
+&lt;p&gt;&lt;img src="https://evertheylen.eu/p/probox-intro/screenshot_ksshaskpass.png"
+width="3048"
+height="1418"
+srcset="https://evertheylen.eu/p/probox-intro/screenshot_ksshaskpass_hu_a7180bff610f9283.png 480w, https://evertheylen.eu/p/probox-intro/screenshot_ksshaskpass_hu_33d3bd7267b80eca.png 1024w"
+loading="lazy"
+alt="The dialog comes from the host, triggered by code-server running in the container"
+class="gallery-image"
+data-flex-grow="214"
+data-flex-basis="515px"
+&gt;&lt;/p&gt;
+&lt;h2 id="probox"&gt;Probox
+&lt;/h2&gt;&lt;p&gt;I automated all the things above in a tool I call &lt;em&gt;probox&lt;/em&gt;. &lt;a class="link" href="https://github.com/evertheylen/probox" target="_blank" rel="noopener"
+&gt;Check it out on GitHub!&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;It is a single Python file without dependencies so it should be easy to install (and verify). It still needs some work (the default image will only work for me) but feel free to reach out to me if you are interested in it.&lt;/p&gt;
+&lt;p&gt;90% of my usage consists of just two commands: &lt;code&gt;probox create&lt;/code&gt; and &lt;code&gt;probox run&lt;/code&gt;. Probox automatically uses the current directory and tries to match it to a project. But there are more commands:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;usage: probox [-h] {create,run,temp,stop,ssh-add,name,ls,overlay,ports} ...
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Manage containers for your development projects (with podman).
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;positional arguments:
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; create Create a new container (box) for your project
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; run Run an existing container (start and exec)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; temp Create and run a temporary container
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; stop Stop a container
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ssh-add Add key to ssh-agent for project (tip: use -c to confirm usage in host)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; name Get name of container attached to directory
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ls List all probox containers
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; overlay Manage overlay files (useful for configs/dotfiles/...)
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; ports List all exposed ports
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;I should also mention similar tools like &lt;code&gt;distrobox&lt;/code&gt; or &lt;code&gt;toolbx&lt;/code&gt;. The major difference is that they do &lt;em&gt;not&lt;/em&gt; strive towards any kind of security guarantees. They mount the entire home directory by default. For example, consider &lt;a class="link" href="https://github.com/containers/toolbox/issues/183" target="_blank" rel="noopener"
+&gt;this toolbx issue&lt;/a&gt; or &lt;a class="link" href="https://github.com/89luca89/distrobox/issues/28#issuecomment-2408529939" target="_blank" rel="noopener"
+&gt;this distrobox issue&lt;/a&gt;.&lt;/p&gt;
+&lt;h2 id="conclusion-is-this-safe"&gt;Conclusion: is this safe?
+&lt;/h2&gt;&lt;p&gt;I hope so! But I’d love to hear what others have to say about it. I read &lt;a class="link" href="https://github.com/containers/podman/discussions/13728#discussioncomment-2900471" target="_blank" rel="noopener"
+&gt;this discussion&lt;/a&gt; but can’t seem to find a better solution than what I have now. &lt;code&gt;probox create&lt;/code&gt; will use these flags:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt;1
+&lt;/span&gt;&lt;span class="lnt"&gt;2
+&lt;/span&gt;&lt;span class="lnt"&gt;3
+&lt;/span&gt;&lt;span class="lnt"&gt;4
+&lt;/span&gt;&lt;span class="lnt"&gt;5
+&lt;/span&gt;&lt;span class="lnt"&gt;6
+&lt;/span&gt;&lt;span class="lnt"&gt;7
+&lt;/span&gt;&lt;span class="lnt"&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-bash" data-lang="bash"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--userns&lt;span class="o"&gt;=&lt;/span&gt;keep-id
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--security-opt &lt;span class="nv"&gt;label&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;disable &lt;span class="c1"&gt;# required for mounting the volume&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--pids-limit&lt;span class="o"&gt;=&lt;/span&gt;-1
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--cap-add&lt;span class="o"&gt;=&lt;/span&gt;NET_RAW &lt;span class="c1"&gt;# required for ping&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--device&lt;span class="o"&gt;=&lt;/span&gt;/dev/fuse &lt;span class="c1"&gt;# required for PINP&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--volume ~/projects/foo:/home/evert/projects/foo
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--volume ~/foo-ssh-agent:/home/evert/ssh-agent.socket
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;--network&lt;span class="o"&gt;=&lt;/span&gt;pasta:-t,auto,-u,auto,-T,none,-U,none
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;Feel free to discuss this article on &lt;a class="link" href="https://news.ycombinator.com/item?id=43061867" target="_blank" rel="noopener"
+&gt;Hackernews&lt;/a&gt; or &lt;a class="link" href="https://www.reddit.com/r/podman/comments/1iqaum4/everyday_project_isolation_for_developers_on/" target="_blank" rel="noopener"
+&gt;r/podman&lt;/a&gt;. Alternatively, &lt;a class="link" href="https://github.com/evertheylen/probox/issues" target="_blank" rel="noopener"
+&gt;open an issue on github&lt;/a&gt; or send me &lt;a class="link" href="mailto:evertheylen@gmail.com" &gt;an email&lt;/a&gt;.&lt;/p&gt;
+&lt;h3 id="bonus-the-rest-of-my-system"&gt;Bonus: the rest of my system
+&lt;/h3&gt;&lt;p&gt;If you are interested in probox, you might also be interested how I protect/isolate other parts of my system. Here’s a quick rundown.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Host OS: Fedora Kinoite. As I do everything in containers anyway, I liked the (minor) benefit of an atomic OS.&lt;/li&gt;
+&lt;li&gt;I run most of my GUI apps in Flatpak (Kate, Spotify, KeePassXC, …). I care less about the “portability” aspect of Flatpak and strongly prefer flatpaks from the Fedora repository over Flathub. I will usually check the permissions given to a flatpak and restrict them if necessary. None of the apps can read my files unrestricted, instead I rely heavily on &lt;a class="link" href="https://docs.flatpak.org/en/latest/portal-api-reference.html" target="_blank" rel="noopener"
+&gt;portals&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;I mainly use Firefox (also in a Flatpak), combined with Chromium for PWA’s like code-server. On top of that I also installed Mullvad browser where I disabled JIT and other fancy features for untrusted websites.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Node vs Bun: no backend performance difference</title><link>https://evertheylen.eu/p/node-vs-bun/</link><pubDate>Fri, 04 Oct 2024 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/p/node-vs-bun/</guid><description>&lt;img src="https://evertheylen.eu/p/node-vs-bun/cover2.webp" alt="Featured image of post Node vs Bun: no backend performance difference" /&gt;&lt;p&gt;In this article I&amp;rsquo;ll be comparing the performance of &lt;a class="link" href="https://bun.sh/" target="_blank" rel="noopener"
+&gt;Bun&lt;/a&gt; vs &lt;a class="link" href="https://nodejs.org/" target="_blank" rel="noopener"
+&gt;Node&lt;/a&gt;. In particular (as Bun is many things), I will focus on their performance as the runtime for your server-side JavaScript code. With Node being the default choice for many, Bun has to prove it is worthy of your attention. It makes strong claims:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;There’s a benchmark right on the homepage, claiming almost &lt;em&gt;5 times&lt;/em&gt; more requests per second than Node! &lt;sup id="fnref:1"&gt;&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/li&gt;
+&lt;li&gt;In the &lt;a class="link" href="https://bun.sh/docs/cli/run#performance" target="_blank" rel="noopener"
+&gt;documentation&lt;/a&gt;, they claim that &lt;em&gt;“In most cases, the startup and running performance is faster than V8, the engine used by Node.js and Chromium-based browsers.”&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Part of what makes this an interesting comparison is that Node uses the &lt;a class="link" href="https://v8.dev/" target="_blank" rel="noopener"
+&gt;V8 engine&lt;/a&gt; (which also powers Chromium-based browsers), while Bun uses &lt;a class="link" href="https://developer.apple.com/documentation/javascriptcore" target="_blank" rel="noopener"
+&gt;JavascriptCore&lt;/a&gt; (which powers Safari).&lt;/p&gt;
+&lt;h2 id="benchmark-setup"&gt;Benchmark setup
+&lt;/h2&gt;&lt;p&gt;I will be running the benchmarks from this excellent GitHub project: &lt;a class="link" href="https://github.com/nDmitry/web-benchmarks" target="_blank" rel="noopener"
+&gt;github.com/nDmitry/web-benchmarks&lt;/a&gt;. The README says:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[…] on each request it simply fetches a 100 fake users from the [Postgres] database, creates a class instance/structure for each row converting a datetime object to an ISO string and encrypting one of the fields with Caesar cypher, serializes resulting array to JSON and responds with this payload.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;I think it’s a reasonable setup for benchmarks like this. The repository also has instructions for running Python and Go benchmarks, if you’re interested in that. (Spoiler: Go is about 2x faster than Node, and Node is &lt;em&gt;maybe&lt;/em&gt; 10% faster than async CPython on a good day.)&lt;/p&gt;
+&lt;p&gt;I adjusted a few things which you can find in &lt;a class="link" href="https://github.com/evertheylen/web-benchmarks" target="_blank" rel="noopener"
+&gt;my fork&lt;/a&gt;. Each benchmark will run with a fixed amount of processes (eg. node-8 will be using 8 processes). I&amp;rsquo;m using &lt;code&gt;hey&lt;/code&gt; to do 50000 requests. All benchmarks run on an AMD 5900X processor (12 physical cores, 24 threads) with 32GB of memory.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;Software versions&lt;/summary&gt;
+&lt;pre&gt;&lt;code&gt;- OS: Arch Linux, kernel 6.9.7-arch1-1
+- Node: v22.9.0
+- Bun: 1.0.28
+- hey: 0.1.4-6
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/details&gt;
+&lt;h2 id="results"&gt;Results
+&lt;/h2&gt;&lt;p&gt;In short: Node has a very slight performance advantage, but it is almost negligible.&lt;/p&gt;
+&lt;figure&gt;&lt;img src="https://evertheylen.eu/p/node-vs-bun/combined_100.svg"&gt;&lt;figcaption&gt;
+&lt;h4&gt;Results for 100 parallel connections&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;I tried many variations of the test, to see if I could find a scenario where the differences would be larger. In particular, I tested different amounts of parallel connections. The chart above is for 100 connections in parallel (&lt;code&gt;hey -c 100&lt;/code&gt;), but the same pattern holds for 200, 800, even up to 2000 connections. At such high connection counts, RPS actually drops for both.&lt;/p&gt;
+&lt;h3 id="running-without-postgres"&gt;Running without Postgres
+&lt;/h3&gt;&lt;p&gt;A rather drastic thing you could do is remove the Postgres connection from the benchmark. I did this by hardcoding the result you’d usually get from Postgres. This makes it almost a “hello world” benchmark, but it still has the Caesar cipher and some &lt;code&gt;JSON.stringify&lt;/code&gt; going on. The result:&lt;/p&gt;
+&lt;figure&gt;&lt;img src="https://evertheylen.eu/p/node-vs-bun/combined_200_nopg.svg"&gt;&lt;figcaption&gt;
+&lt;h4&gt;Results for 200 parallel connections, without Postgres&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;Here, Bun clearly takes the win. In fact, I tried the Go server and it hits (only) about 100k RPS. Bun beats Go! However, I’d argue this is almost meaningless. If your server is this simple, run it in the client.&lt;/p&gt;
+&lt;h2 id="discussion"&gt;Discussion
+&lt;/h2&gt;&lt;p&gt;It&amp;rsquo;s a boring result, but an expected one: in real-world usecases, your servers will likely &lt;strong&gt;not&lt;/strong&gt; get any performance boost out of Bun. Bun&amp;rsquo;s extraordinary claims only hold up for hello-world-style benchmarks.&lt;/p&gt;
+&lt;h3 id="multiprocessing-differences"&gt;Multiprocessing differences
+&lt;/h3&gt;&lt;p&gt;To run a Node server with multiple processes, I used the &lt;code&gt;cluster&lt;/code&gt; package, but this is &lt;a class="link" href="https://bun.sh/guides/http/cluster" target="_blank" rel="noopener"
+&gt;not implemented yet in Bun&lt;/a&gt;. Instead I have to &lt;code&gt;spawn&lt;/code&gt; different Bun processes that should each run &lt;code&gt;serve({reusePort: true, ...})&lt;/code&gt;, as described by the &lt;a class="link" href="https://bun.sh/guides/http/cluster" target="_blank" rel="noopener"
+&gt;excellent Bun guides&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The end result works similarly to Node’s &lt;code&gt;cluster&lt;/code&gt; module, but Node’s solution is a lot nicer to use. It’s easier to check for &lt;code&gt;cluster.isPrimary&lt;/code&gt; and use &lt;code&gt;cluster.fork()&lt;/code&gt; than to maintain multiple entrypoints. Node also &lt;a class="link" href="https://nodejs.org/api/cluster.html#how-it-works" target="_blank" rel="noopener"
+&gt;claims&lt;/a&gt; “&lt;em&gt;some built-in smarts to avoid overloading a worker process&lt;/em&gt;”, which Bun may lack. On the other hand, inter-process communication seems easy on both platforms should you need it.&lt;/p&gt;
+&lt;h3 id="impact-of-frameworks"&gt;Impact of frameworks
+&lt;/h3&gt;&lt;p&gt;I chose not to use any server frameworks/libraries to focus on the runtime itself. The original repository did test a few popular Node frameworks, which shows a sizable performance impact. From fast to slow, it goes koa &amp;gt; express &amp;gt; hapi. In any case, not using a framework is always the fastest.&lt;/p&gt;
+&lt;p&gt;In my own (separate) tests, using a library like hapi did make Node substantially slower than Bun. Bun’s native &lt;code&gt;serve&lt;/code&gt; API feels more modern and functional, so maybe you won&amp;rsquo;t need a framework at all. If you have to choose between Node+hapi and just Bun, Bun will win. But as a more realistic example, Node+koa vs Bun+Hono is (probably) going to be quite close.&lt;/p&gt;
+&lt;h3 id="startup-time"&gt;Startup time
+&lt;/h3&gt;&lt;p&gt;Bun also claims a much faster startup time. I have no reason to doubt that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ hyperfine\
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;#34;node -e &amp;#39;require(\&amp;#34;http\&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;&amp;#34;\
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;#34;bun -e &amp;#39;(await import(\&amp;#34;bun\&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Benchmark 1: node -e &amp;#39;require(&amp;#34;http&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Time (mean ± σ): 18.6 ms ± 1.7 ms [User: 12.7 ms, System: 6.1 ms]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Range (min … max): 17.4 ms … 29.8 ms 142 runs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Benchmark 2: bun -e &amp;#39;(await import(&amp;#34;bun&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Time (mean ± σ): 11.7 ms ± 0.5 ms [User: 4.3 ms, System: 9.5 ms]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Range (min … max): 11.1 ms … 14.5 ms 253 runs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Summary
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; bun -e &amp;#39;(await import(&amp;#34;bun&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39; ran
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; 1.59 ± 0.15 times faster than node -e &amp;#39;require(&amp;#34;http&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;The extra 7ms is nice for tooling, but for servers I honestly don’t think it matters much.&lt;/p&gt;
+&lt;h3 id="where-is-deno"&gt;Where is Deno?
+&lt;/h3&gt;&lt;p&gt;I like that Deno tries something new with an &lt;a class="link" href="https://docs.deno.com/runtime/fundamentals/security/" target="_blank" rel="noopener"
+&gt;interesting permission system&lt;/a&gt;. But from a performance perspective, they use V8 just like Node, so I thought it was less interesting. Feel free to &lt;a class="link" href="https://github.com/evertheylen/web-benchmarks" target="_blank" rel="noopener"
+&gt;send a PR&lt;/a&gt; with a Deno server and I’ll include the results.&lt;/p&gt;
+&lt;div class="footnotes" role="doc-endnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id="fn:1"&gt;
+&lt;p&gt;I believe there is a chance Bun is kinda cheating here, with a different version of React than what Node uses. See &lt;a class="link" href="https://medium.com/deno-the-complete-reference/node-js-vs-deno-vs-bun-server-side-rendering-performance-comparison-f80a5abc766f" target="_blank" rel="noopener"
+&gt;this benchmark&lt;/a&gt;.&amp;#160;&lt;a href="#fnref:1" class="footnote-backref" role="doc-backlink"&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description></item><item><title>My Desktop+Tablet Development Setup</title><link>https://evertheylen.eu/p/my-desktop-tablet-development-setup/</link><pubDate>Sun, 11 Feb 2024 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/p/my-desktop-tablet-development-setup/</guid><description>&lt;img src="https://evertheylen.eu/p/my-desktop-tablet-development-setup/tablet_with_desktop.jpg" alt="Featured image of post My Desktop+Tablet Development Setup" /&gt;&lt;h1 id="the-problem"&gt;The problem
+&lt;/h1&gt;&lt;p&gt;My requirements are as follows:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;My main development environment has to be Linux. (Not just WSL, I want a proper Linux desktop environment.)&lt;/li&gt;
+&lt;li&gt;I like to sketch stuff and draw diagrams. Paper works, but it gets disorganized really quickly. A digital device allows me to keep my notes organized and you can have an infinite canvas with nice colors and edit history. (Note: I don’t think there are good apps like this on Linux.)&lt;/li&gt;
+&lt;li&gt;I want to build my own desktop. You can get a lot more performance for your money, and I can hand-pick each component to my liking (e.g. a good CPU, a mid-tier GPU, stellar Linux support).&lt;/li&gt;
+&lt;li&gt;While I spend most of my time working from home, I do have to work in other places sometimes. I don’t want to maintain duplicate environments.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Requirement 2 suggests a tablet, 3 suggests a desktop, and 4 suggests a laptop. A windows laptop-tablet hybrid may be a compromise solution but I tried it and did not like it &lt;sup id="fnref:1"&gt;&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/p&gt;
+&lt;h1 id="the-solution"&gt;The solution
+&lt;/h1&gt;&lt;p&gt;I have two devices:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;A desktop I built myself, which runs Linux.&lt;/li&gt;
+&lt;li&gt;A Samsung Tab S7+, on which I run OneNote.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This setup satisfies requirements 1, 2 and 3. But how do I satisfy requirement 4? It’s a combination of three things:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a class="link" href="https://github.com/coder/code-server" target="_blank" rel="noopener"
+&gt;code-server&lt;/a&gt;, which lets you run Visual Studio Code in any browser.&lt;/li&gt;
+&lt;li&gt;&lt;a class="link" href="https://www.samsung.com/us/apps/dex/" target="_blank" rel="noopener"
+&gt;DeX mode&lt;/a&gt; on the Samsung tablet, although not technically required, gives me a traditional desktop environment. I also have the keyboard accessory.&lt;/li&gt;
+&lt;li&gt;A bunch of networking configuration so I can reach my desktop from the internet. I only expose a single SSH port, and use SSH tunnels for anything else. (I use &lt;a class="link" href="https://www.duckdns.org/" target="_blank" rel="noopener"
+&gt;duckdns&lt;/a&gt; and &lt;a class="link" href="https://juicessh.com/" target="_blank" rel="noopener"
+&gt;JuiceSSH Pro&lt;/a&gt; to make it work).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;This allows me to remotely connect with code-server (running on my desktop) through an SSH tunnel. In the end I’m able to work using the exact same editor as if I were on my desktop. This isn’t rocket science of course, it’s kinda like a home-built version of &lt;a class="link" href="https://github.com/features/codespaces" target="_blank" rel="noopener"
+&gt;Github Codespaces&lt;/a&gt; where the server lives in your house.&lt;/p&gt;
+&lt;p&gt;This is fine for “simple” development where you never leave your IDE or terminal. Web development is a little harder because you really want to debug your frontend using devtools. While forwarding the ports to &lt;a class="link" href="https://vitejs.dev/" target="_blank" rel="noopener"
+&gt;vite&lt;/a&gt; (or whatever you want to use) is no problem, most browsers on Android assume you do all your debugging work remotely via USB or the network. The solution is &lt;a class="link" href="https://kiwibrowser.com/" target="_blank" rel="noopener"
+&gt;Kiwi Browser&lt;/a&gt;, which has full devtools available.&lt;/p&gt;
+&lt;h1 id="conclusion"&gt;Conclusion
+&lt;/h1&gt;&lt;p&gt;I’ve been using this setup for more than 2 years now and I really like it. It’s not for everyone as it requires a little work to set up and maintain, but for me it combines the best of Android with the best of (Desktop) Linux leading to a very smooth experience.&lt;/p&gt;
+&lt;p&gt;If you have any questions about this setup, feel free to &lt;a class="link" href="mailto:evertheylen@gmail.com" &gt;contact me&lt;/a&gt;!&lt;/p&gt;
+&lt;div class="footnotes" role="doc-endnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id="fn:1"&gt;
+&lt;p&gt;I once had an &lt;a class="link" href="https://support.hp.com/us-en/document/c06010885" target="_blank" rel="noopener"
+&gt;HP ZBook Studio G5&lt;/a&gt;, which seemed like a powerful laptop with a nice large pen-supported touchscreen. One problem, Linux support was really sketchy. I really tried to make it work, even manually compiling chromium to include Wayland support. Even then I couldn’t find a good note-taking app. So I settled on Windows with WSL but just plain didn’t like it. Then one day I opened my laptop to a big advert for some XBox service and that settled it &amp;ndash; no more Windows.&amp;#160;&lt;a href="#fnref:1" class="footnote-backref" role="doc-backlink"&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description></item><item><title>About me</title><link>https://evertheylen.eu/about/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/about/</guid><description>&lt;img src="https://evertheylen.eu/about/ecrins.jpg" alt="Featured image of post About me" /&gt;&lt;p&gt;I strongly believe the climate crisis is the most pressing problem of our time. Therefore, I want to actively work towards a more sustainable society.&lt;/p&gt;
+&lt;p&gt;I love coding and have a degree in &lt;a class="link" href="https://onderwijsaanbod.kuleuven.be/opleidingen/e/CQ_52364384.htm#activetab=diploma_omschrijving" target="_blank" rel="noopener"
+&gt;Computer Science&lt;/a&gt;. I am based in Belgium. When I&amp;rsquo;m not coding you can find me climbing, mountaineering or doing other sports.&lt;/p&gt;
+&lt;p&gt;Feel free to contact me at &lt;a class="link" href="mailto:evertheylen@gmail.com" &gt;evertheylen@gmail.com&lt;/a&gt; if you have any questions!&lt;/p&gt;
+&lt;h1 id="some-projects"&gt;Some projects
+&lt;/h1&gt;&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class="link" href="https://github.com/evertheylen/probox" target="_blank" rel="noopener"
+&gt;probox&lt;/a&gt;&lt;/strong&gt;: A tool to create secure, isolated development environments without sacrificing performance or ease of use.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class="link" href="https://github.com/evertheylen/logicpy" target="_blank" rel="noopener"
+&gt;logicpy&lt;/a&gt;&lt;/strong&gt;: An implementation of the concepts underlying Prolog and logic programming, in pure Python.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class="link" href="https://github.com/evertheylen/Notation" target="_blank" rel="noopener"
+&gt;Notation&lt;/a&gt;&lt;/strong&gt;: A small webapp to make drawings that are easy to embed in Notion. (no longer online)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a class="link" href="https://github.com/evertheylen/TA_TO/tree/master/Helix" target="_blank" rel="noopener"
+&gt;Helix&lt;/a&gt;&lt;/strong&gt;: Fuzzy matching of regular expressions in DNA, university project.&lt;/li&gt;
+&lt;li&gt;I think developers still spend a &lt;em&gt;lot&lt;/em&gt; of time on moving data around, so I wrote two ORMs: &lt;a class="link" href="https://github.com/evertheylen/univocal" target="_blank" rel="noopener"
+&gt;Univocal&lt;/a&gt; in Javascript and &lt;a class="link" href="https://github.com/evertheylen/Sparrow" target="_blank" rel="noopener"
+&gt;Sparrow&lt;/a&gt; in Python.&lt;/li&gt;
+&lt;/ul&gt;</description></item><item><title>Archives</title><link>https://evertheylen.eu/archives/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/archives/</guid><description/></item><item><title>Search</title><link>https://evertheylen.eu/search/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/search/</guid><description/></item></channel></rss>

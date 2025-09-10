@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Benchmark on Evert Heylen</title><link>https://evertheylen.eu/tags/benchmark/</link><description>Recent content in Benchmark on Evert Heylen</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Fri, 04 Oct 2024 00:00:00 +0000</lastBuildDate><atom:link href="https://evertheylen.eu/tags/benchmark/index.xml" rel="self" type="application/rss+xml"/><item><title>Node vs Bun: no backend performance difference</title><link>https://evertheylen.eu/p/node-vs-bun/</link><pubDate>Fri, 04 Oct 2024 00:00:00 +0000</pubDate><guid>https://evertheylen.eu/p/node-vs-bun/</guid><description>&lt;img src="https://evertheylen.eu/p/node-vs-bun/cover2.webp" alt="Featured image of post Node vs Bun: no backend performance difference" /&gt;&lt;p&gt;In this article I&amp;rsquo;ll be comparing the performance of &lt;a class="link" href="https://bun.sh/" target="_blank" rel="noopener"
+&gt;Bun&lt;/a&gt; vs &lt;a class="link" href="https://nodejs.org/" target="_blank" rel="noopener"
+&gt;Node&lt;/a&gt;. In particular (as Bun is many things), I will focus on their performance as the runtime for your server-side JavaScript code. With Node being the default choice for many, Bun has to prove it is worthy of your attention. It makes strong claims:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;There’s a benchmark right on the homepage, claiming almost &lt;em&gt;5 times&lt;/em&gt; more requests per second than Node! &lt;sup id="fnref:1"&gt;&lt;a href="#fn:1" class="footnote-ref" role="doc-noteref"&gt;1&lt;/a&gt;&lt;/sup&gt;.&lt;/li&gt;
+&lt;li&gt;In the &lt;a class="link" href="https://bun.sh/docs/cli/run#performance" target="_blank" rel="noopener"
+&gt;documentation&lt;/a&gt;, they claim that &lt;em&gt;“In most cases, the startup and running performance is faster than V8, the engine used by Node.js and Chromium-based browsers.”&lt;/em&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Part of what makes this an interesting comparison is that Node uses the &lt;a class="link" href="https://v8.dev/" target="_blank" rel="noopener"
+&gt;V8 engine&lt;/a&gt; (which also powers Chromium-based browsers), while Bun uses &lt;a class="link" href="https://developer.apple.com/documentation/javascriptcore" target="_blank" rel="noopener"
+&gt;JavascriptCore&lt;/a&gt; (which powers Safari).&lt;/p&gt;
+&lt;h2 id="benchmark-setup"&gt;Benchmark setup
+&lt;/h2&gt;&lt;p&gt;I will be running the benchmarks from this excellent GitHub project: &lt;a class="link" href="https://github.com/nDmitry/web-benchmarks" target="_blank" rel="noopener"
+&gt;github.com/nDmitry/web-benchmarks&lt;/a&gt;. The README says:&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;[…] on each request it simply fetches a 100 fake users from the [Postgres] database, creates a class instance/structure for each row converting a datetime object to an ISO string and encrypting one of the fields with Caesar cypher, serializes resulting array to JSON and responds with this payload.&lt;/p&gt;&lt;/blockquote&gt;
+&lt;p&gt;I think it’s a reasonable setup for benchmarks like this. The repository also has instructions for running Python and Go benchmarks, if you’re interested in that. (Spoiler: Go is about 2x faster than Node, and Node is &lt;em&gt;maybe&lt;/em&gt; 10% faster than async CPython on a good day.)&lt;/p&gt;
+&lt;p&gt;I adjusted a few things which you can find in &lt;a class="link" href="https://github.com/evertheylen/web-benchmarks" target="_blank" rel="noopener"
+&gt;my fork&lt;/a&gt;. Each benchmark will run with a fixed amount of processes (eg. node-8 will be using 8 processes). I&amp;rsquo;m using &lt;code&gt;hey&lt;/code&gt; to do 50000 requests. All benchmarks run on an AMD 5900X processor (12 physical cores, 24 threads) with 32GB of memory.&lt;/p&gt;
+&lt;details&gt;
+&lt;summary&gt;Software versions&lt;/summary&gt;
+&lt;pre&gt;&lt;code&gt;- OS: Arch Linux, kernel 6.9.7-arch1-1
+- Node: v22.9.0
+- Bun: 1.0.28
+- hey: 0.1.4-6
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/details&gt;
+&lt;h2 id="results"&gt;Results
+&lt;/h2&gt;&lt;p&gt;In short: Node has a very slight performance advantage, but it is almost negligible.&lt;/p&gt;
+&lt;figure&gt;&lt;img src="https://evertheylen.eu/p/node-vs-bun/combined_100.svg"&gt;&lt;figcaption&gt;
+&lt;h4&gt;Results for 100 parallel connections&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;I tried many variations of the test, to see if I could find a scenario where the differences would be larger. In particular, I tested different amounts of parallel connections. The chart above is for 100 connections in parallel (&lt;code&gt;hey -c 100&lt;/code&gt;), but the same pattern holds for 200, 800, even up to 2000 connections. At such high connection counts, RPS actually drops for both.&lt;/p&gt;
+&lt;h3 id="running-without-postgres"&gt;Running without Postgres
+&lt;/h3&gt;&lt;p&gt;A rather drastic thing you could do is remove the Postgres connection from the benchmark. I did this by hardcoding the result you’d usually get from Postgres. This makes it almost a “hello world” benchmark, but it still has the Caesar cipher and some &lt;code&gt;JSON.stringify&lt;/code&gt; going on. The result:&lt;/p&gt;
+&lt;figure&gt;&lt;img src="https://evertheylen.eu/p/node-vs-bun/combined_200_nopg.svg"&gt;&lt;figcaption&gt;
+&lt;h4&gt;Results for 200 parallel connections, without Postgres&lt;/h4&gt;
+&lt;/figcaption&gt;
+&lt;/figure&gt;
+&lt;p&gt;Here, Bun clearly takes the win. In fact, I tried the Go server and it hits (only) about 100k RPS. Bun beats Go! However, I’d argue this is almost meaningless. If your server is this simple, run it in the client.&lt;/p&gt;
+&lt;h2 id="discussion"&gt;Discussion
+&lt;/h2&gt;&lt;p&gt;It&amp;rsquo;s a boring result, but an expected one: in real-world usecases, your servers will likely &lt;strong&gt;not&lt;/strong&gt; get any performance boost out of Bun. Bun&amp;rsquo;s extraordinary claims only hold up for hello-world-style benchmarks.&lt;/p&gt;
+&lt;h3 id="multiprocessing-differences"&gt;Multiprocessing differences
+&lt;/h3&gt;&lt;p&gt;To run a Node server with multiple processes, I used the &lt;code&gt;cluster&lt;/code&gt; package, but this is &lt;a class="link" href="https://bun.sh/guides/http/cluster" target="_blank" rel="noopener"
+&gt;not implemented yet in Bun&lt;/a&gt;. Instead I have to &lt;code&gt;spawn&lt;/code&gt; different Bun processes that should each run &lt;code&gt;serve({reusePort: true, ...})&lt;/code&gt;, as described by the &lt;a class="link" href="https://bun.sh/guides/http/cluster" target="_blank" rel="noopener"
+&gt;excellent Bun guides&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The end result works similarly to Node’s &lt;code&gt;cluster&lt;/code&gt; module, but Node’s solution is a lot nicer to use. It’s easier to check for &lt;code&gt;cluster.isPrimary&lt;/code&gt; and use &lt;code&gt;cluster.fork()&lt;/code&gt; than to maintain multiple entrypoints. Node also &lt;a class="link" href="https://nodejs.org/api/cluster.html#how-it-works" target="_blank" rel="noopener"
+&gt;claims&lt;/a&gt; “&lt;em&gt;some built-in smarts to avoid overloading a worker process&lt;/em&gt;”, which Bun may lack. On the other hand, inter-process communication seems easy on both platforms should you need it.&lt;/p&gt;
+&lt;h3 id="impact-of-frameworks"&gt;Impact of frameworks
+&lt;/h3&gt;&lt;p&gt;I chose not to use any server frameworks/libraries to focus on the runtime itself. The original repository did test a few popular Node frameworks, which shows a sizable performance impact. From fast to slow, it goes koa &amp;gt; express &amp;gt; hapi. In any case, not using a framework is always the fastest.&lt;/p&gt;
+&lt;p&gt;In my own (separate) tests, using a library like hapi did make Node substantially slower than Bun. Bun’s native &lt;code&gt;serve&lt;/code&gt; API feels more modern and functional, so maybe you won&amp;rsquo;t need a framework at all. If you have to choose between Node+hapi and just Bun, Bun will win. But as a more realistic example, Node+koa vs Bun+Hono is (probably) going to be quite close.&lt;/p&gt;
+&lt;h3 id="startup-time"&gt;Startup time
+&lt;/h3&gt;&lt;p&gt;Bun also claims a much faster startup time. I have no reason to doubt that:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;div class="chroma"&gt;
+&lt;table class="lntable"&gt;&lt;tr&gt;&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code&gt;&lt;span class="lnt"&gt; 1
+&lt;/span&gt;&lt;span class="lnt"&gt; 2
+&lt;/span&gt;&lt;span class="lnt"&gt; 3
+&lt;/span&gt;&lt;span class="lnt"&gt; 4
+&lt;/span&gt;&lt;span class="lnt"&gt; 5
+&lt;/span&gt;&lt;span class="lnt"&gt; 6
+&lt;/span&gt;&lt;span class="lnt"&gt; 7
+&lt;/span&gt;&lt;span class="lnt"&gt; 8
+&lt;/span&gt;&lt;span class="lnt"&gt; 9
+&lt;/span&gt;&lt;span class="lnt"&gt;10
+&lt;/span&gt;&lt;span class="lnt"&gt;11
+&lt;/span&gt;&lt;span class="lnt"&gt;12
+&lt;/span&gt;&lt;span class="lnt"&gt;13
+&lt;/span&gt;&lt;span class="lnt"&gt;14
+&lt;/span&gt;&lt;span class="lnt"&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td class="lntd"&gt;
+&lt;pre tabindex="0" class="chroma"&gt;&lt;code class="language-fallback" data-lang="fallback"&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;$ hyperfine\
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;#34;node -e &amp;#39;require(\&amp;#34;http\&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;&amp;#34;\
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; &amp;#34;bun -e &amp;#39;(await import(\&amp;#34;bun\&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39;&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Benchmark 1: node -e &amp;#39;require(&amp;#34;http&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Time (mean ± σ): 18.6 ms ± 1.7 ms [User: 12.7 ms, System: 6.1 ms]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Range (min … max): 17.4 ms … 29.8 ms 142 runs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Benchmark 2: bun -e &amp;#39;(await import(&amp;#34;bun&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Time (mean ± σ): 11.7 ms ± 0.5 ms [User: 4.3 ms, System: 9.5 ms]
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; Range (min … max): 11.1 ms … 14.5 ms 253 runs
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt;Summary
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; bun -e &amp;#39;(await import(&amp;#34;bun&amp;#34;)).serve({fetch: () =&amp;gt; {}, port: 8000, development: false}).stop()&amp;#39; ran
+&lt;/span&gt;&lt;/span&gt;&lt;span class="line"&gt;&lt;span class="cl"&gt; 1.59 ± 0.15 times faster than node -e &amp;#39;require(&amp;#34;http&amp;#34;).createServer(() =&amp;gt; {}).listen(8000).close()&amp;#39;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;The extra 7ms is nice for tooling, but for servers I honestly don’t think it matters much.&lt;/p&gt;
+&lt;h3 id="where-is-deno"&gt;Where is Deno?
+&lt;/h3&gt;&lt;p&gt;I like that Deno tries something new with an &lt;a class="link" href="https://docs.deno.com/runtime/fundamentals/security/" target="_blank" rel="noopener"
+&gt;interesting permission system&lt;/a&gt;. But from a performance perspective, they use V8 just like Node, so I thought it was less interesting. Feel free to &lt;a class="link" href="https://github.com/evertheylen/web-benchmarks" target="_blank" rel="noopener"
+&gt;send a PR&lt;/a&gt; with a Deno server and I’ll include the results.&lt;/p&gt;
+&lt;div class="footnotes" role="doc-endnotes"&gt;
+&lt;hr&gt;
+&lt;ol&gt;
+&lt;li id="fn:1"&gt;
+&lt;p&gt;I believe there is a chance Bun is kinda cheating here, with a different version of React than what Node uses. See &lt;a class="link" href="https://medium.com/deno-the-complete-reference/node-js-vs-deno-vs-bun-server-side-rendering-performance-comparison-f80a5abc766f" target="_blank" rel="noopener"
+&gt;this benchmark&lt;/a&gt;.&amp;#160;&lt;a href="#fnref:1" class="footnote-backref" role="doc-backlink"&gt;&amp;#x21a9;&amp;#xfe0e;&lt;/a&gt;&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/div&gt;</description></item></channel></rss>
