@@ -1,11 +1,13 @@
 ---
-title: Everyday project isolation for developers on Linux
+title: We need to start shaming developers who don't use isolation
 slug: shame-devs-without-isolation
 date: 2026-05-24
-image: cover.jpg
+image: cover_extended.jpg
 tags:
     - containers
 ---
+
+## Holding developers accountable
 
 It seems we are seeing supply-chain attacks [every](https://safedep.io/mini-shai-hulud-strikes-again-314-npm-packages-compromised/) [other](https://opensourcemalware.com/npm/@bitwarden/cli) [day](https://www.stepsecurity.io/blog/nx-console-vs-code-extension-compromised) now. There are two main reasons for this:
 
@@ -18,7 +20,7 @@ There are various tools available for it. [I made one myself](https://evertheyle
 
 I would argue that we should start holding developers accountable. Some level of isolation should be expected. If not, they should get similar amounts of flak as those still writing SQL queries with string interpolation, or storing plaintext passwords.
 
-# Symmetric keys are problematic
+## Symmetric keys are problematic
 
 Okay, that was a spicy take. In practice there are still some hindrances. I’ve been using my own tool for a while now and I encounter plenty of problems with protecting key secrets.
 
@@ -26,13 +28,13 @@ I mentioned protecting your SSH keys. If your development environment doesn’t 
 
 Sadly most tools and APIs use symmetric keys or passwords. It is so common we skip the word “symmetric” altogether. Tools like `flyctl` (Fly.io) or `doctl` (DigitalOcean) all store some kind of symmetric secret in your home folder. It is very hard to protect those secrets without a deeper integration with the software trying to use them.
 
-## What about HTTP APIs?
+### What about HTTP APIs?
 
 Both [Deno](https://deno.com/deploy/sandbox) and [Fly](https://github.com/superfly/tokenizer) have projects that “intercept” your HTTP API calls and replace placeholder secrets with the real (still symmetric) ones. I consider this one example of a “deeper integration”. Forcing the use of an HTTP proxy is not always trivial.
 
 Personally I feel like asymmetric keys are a more elegant and universal solution. Sadly client-side certificates for HTTPS are not supported in standard `fetch`. I’ve only ever used [one API](https://benerail.com/solutions/moove_api/) that used client-side certificates, but it may be more common in industries like banking or healthcare.
 
-# Call to action
+## Call to action
 
 **To developers:** please consider using *some* form of isolation so that the impact of installing  or using malicious dependencies is limited. (Note: default settings for Docker are usually not sufficient!)
 
