@@ -40,5 +40,5 @@ Personally I feel like asymmetric keys are a more elegant and universal solution
 
 **To companies:** please consider using a system with asymmetric keys instead of symmetric API keys. Alternatively, give instructions on how to use your API with a project like Fly’s [tokenizer](https://github.com/superfly/tokenizer) or some system using short-lived tokens. Just don't assume your software will run in an environment that has access to symmetric keys.
 
-**To you, dear reader:** I’d be very happy to hear your thoughts about this. Feel free to write a comment on Hacker News or reach out to me [via email](mailto:evertheylen@gmail.com).
+**To you, dear reader:** I’d be very happy to hear your thoughts about this. Feel free to write a comment on [Hacker News](https://news.ycombinator.com/item?id=48257275) or reach out to me [via email](mailto:evertheylen@gmail.com).
 
