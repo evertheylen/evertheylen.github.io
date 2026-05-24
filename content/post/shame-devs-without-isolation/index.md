@@ -1,5 +1,5 @@
 ---
-title: We need to start shaming developers who don't use isolation
+title: Should we start shaming developers who don't use isolation?
 slug: shame-devs-without-isolation
 date: 2026-05-24
 image: cover_extended.jpg
@@ -18,7 +18,7 @@ Much has been written about the former. It may require the industry to adopt a d
 
 There are various tools available for it. [I made one myself](https://evertheylen.eu/p/probox-intro/) based on podman. Maybe you prefer stricter protection through the use of [virtual machines](https://www.qubes-os.org/) instead. Maybe you prefer running dev environments on [someone else’s computer](https://sprites.dev/) altogether. But at least there should be *some* barrier between `npm install` and `cat ~/.ssh/id_rsa`, no?
 
-I would argue that we should start holding developers accountable. Some level of isolation should be expected. If not, they should get similar amounts of flak as those still writing SQL queries with string interpolation, or storing plaintext passwords. As an industry, we should do better!
+I would argue that we should start holding developers accountable. Some level of isolation should be expected. Failing to do so should earn them a similar amount of flak as those still writing SQL queries with string interpolation, or storing plaintext passwords. As an industry, we should do better!
 
 ## Symmetric keys are problematic
 
@@ -38,7 +38,7 @@ Personally I feel like asymmetric keys are a more elegant and universal solution
 
 **To individual developers:** please consider using *some* form of isolation so that the impact of installing or using malicious dependencies is limited. (Note: default settings for Docker are usually not sufficient!)
 
-**To companies:** please consider using a system with asymmetric keys instead of symmetric API keys. Alternatively, give instructions on how to use your API with a project like Fly’s [tokenizer](https://github.com/superfly/tokenizer). Just don't assume your software will run in an environment that has access to symmetric keys.
+**To companies:** please consider using a system with asymmetric keys instead of symmetric API keys. Alternatively, give instructions on how to use your API with a project like Fly’s [tokenizer](https://github.com/superfly/tokenizer) or some system using short-lived tokens. Just don't assume your software will run in an environment that has access to symmetric keys.
 
 **To you, dear reader:** I’d be very happy to hear your thoughts about this. Feel free to write a comment on Hacker News or reach out to me [via email](mailto:evertheylen@gmail.com).
 
