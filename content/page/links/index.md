@@ -12,7 +12,7 @@ menu:
             icon: link
 
 comments: false
-_build:
+build:
   list: false
   render: false
 
